@@ -15,6 +15,18 @@ export default function Home() {
     update(); window.addEventListener('scroll', update, { passive: true }); window.addEventListener('resize', update); window.visualViewport?.addEventListener('resize', update); window.visualViewport?.addEventListener('scroll', update);
     return () => { cancelAnimationFrame(frame); window.removeEventListener('scroll', update); window.removeEventListener('resize', update); window.visualViewport?.removeEventListener('resize', update); window.visualViewport?.removeEventListener('scroll', update); };
   }, []);
+  useEffect(() => {
+    const cards = Array.from(document.querySelectorAll<HTMLElement>('.product'));
+    if (!('IntersectionObserver' in window)) {
+      cards.forEach((card) => card.classList.add('is-visible'));
+      return;
+    }
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => entry.target.classList.toggle('is-visible', entry.isIntersecting && entry.intersectionRatio >= .42));
+    }, { threshold: [.18, .42, .68], rootMargin: '-8% 0px -12%' });
+    cards.forEach((card) => observer.observe(card));
+    return () => observer.disconnect();
+  }, []);
   return <main>
     <header className="nav"><a className="brand" href="#top" aria-label="Móvel Estrutura — início"><b>MÓVEL</b><span>ESTRUTURA</span></a><nav aria-label="Navegação principal"><a href="#solucoes">Soluções</a><a href="#projetos">Projetos</a><a href="#sobre">Sobre</a></nav><a className="pill" href="mailto:movelestrutura@gmail.com?subject=Orçamento%20Móvel%20Estrutura">Pedir orçamento <span>↗</span></a></header>
     <section className="hero" id="top" ref={heroRef}><div className="heroScene"><img className="heroBack" src="/images/stage-corporate.jpeg" alt="Estrutura para evento corporativo montada em Belo Horizonte"/><div className="heroShade"/><div className="panelReveal" style={{clipPath:`inset(${100-Math.min(1,progress*1.45)*100}% 0 0)`,WebkitClipPath:`inset(${100-Math.min(1,progress*1.45)*100}% 0 0)`}}><img src="/images/stage-corporate.jpeg" alt="Palco modular e painel de lona para evento corporativo"/></div><div className="heroCopy" style={{opacity:Math.max(0,(progress-.48)/.3),transform:`translate3d(0,${Math.max(0,1-(progress-.48)/.3)*70}px,0)`}}><p className="eyebrow">LOCAÇÃO &amp; VENDA</p><h1>Estrutura que<br/><em>move</em> seu evento.</h1><p>Locação e venda de estruturas para eventos em Belo Horizonte: praticáveis, gradis, box truss e fechamentos com montagem segura e entrega pontual.</p><a className="cta" href="#solucoes">Explore as soluções <span>↓</span></a></div><span className="scrollCue" style={{opacity:1-Math.min(1,progress*3)}}>Role para revelar <b>↓</b></span></div></section>
